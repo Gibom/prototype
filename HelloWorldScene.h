@@ -12,15 +12,30 @@ public:
 
 	CREATE_FUNC(HelloWorld);
 	char str[100] = { 0 };
-	int status = 0;
+	int status = 0;	//현재 영웅 아이템 보유상태
+	int fight = 0;	//몬스터 충돌시 비교 카운트
+
+	//Position
 	cocos2d::Size winSize;
 	cocos2d::Vec2 itemPosition;
 	cocos2d::Vec2 monsterPosition;
 	cocos2d::Vec2 heroPosition;
+	
+	//Hero
 	cocos2d::Sprite* hero;
+	
+	//Item, Monster Create
 	cocos2d::Vector<cocos2d::Sprite*> itemV;
-	cocos2d::Sprite* item;
-	cocos2d::Sprite* monster;
+	cocos2d::Sprite* itemSprite1;
+	cocos2d::Sprite* itemSprite2;
+	cocos2d::Sprite* itemSprite3;
+	cocos2d::Sprite* itemSprite4;
+	cocos2d::Sprite* itemSprite5;
+	cocos2d::Sprite* monsterSprite1;
+	cocos2d::Sprite* monsterSprite2;
+	cocos2d::Sprite* monsterSprite3;
+	
+	//Tile
 	cocos2d::TMXTiledMap* tmap;
 	cocos2d::TMXLayer* background;
 	cocos2d::TMXLayer* items;
@@ -28,11 +43,15 @@ public:
 	cocos2d::Vector<cocos2d::SpriteFrame*> animFrames;
 	cocos2d::Vector<cocos2d::SpriteFrame*> animFrames2;
 
+
+	//TouchEvent
 	virtual void onEnter();
 	virtual void onExit();
 	bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
 	void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
 
+
+	//Function
 	void createHero();
 	void setViewpointCenter(cocos2d::Vec2 position);
 	cocos2d::Vec2 tileCoordForPosition(cocos2d::Vec2 position);

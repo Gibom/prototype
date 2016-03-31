@@ -32,23 +32,57 @@ bool HelloWorld::init()
 
 	//오브젝트 읽어 오기
 	auto objects = tmap->getObjectGroup("Objects");
-
+	//------------------------------------------------------------------------
 	//영웅 생성
 	ValueMap spawnPoint = objects->getObject("SpawnPoint");
 	int x = spawnPoint["x"].asInt();
 	int y = spawnPoint["y"].asInt();
 	heroPosition = Vec2(x, y);
+	log("Hero Create Check : x.%f y.%f", heroPosition.x, heroPosition.y);
 	this->createHero();
 
 	//아이템, 몬스터 생성
+
+	//Sprite 사용 Item 생성
+	//#item1
 	ValueMap itemPoint = objects->getObject("Sword");
 	int ix = itemPoint["x"].asInt();
 	int iy = itemPoint["y"].asInt();
 	itemPosition = Vec2(ix, iy);
-	item = Sprite::createWithSpriteFrameName("W_Sword001.png");
-	item->setPosition(itemPosition);
-	this->addChild(item);
+	itemSprite1 = Sprite::createWithSpriteFrameName("W_Sword001.png");
+	itemSprite1->setPosition(itemPosition);
+	this->addChild(itemSprite1);
 
+
+	//#item2
+	itemPoint = objects->getObject("Sword2");
+	ix = itemPoint["x"].asInt();
+	iy = itemPoint["y"].asInt();
+	itemPosition = Vec2(ix, iy);
+	itemSprite2 = Sprite::createWithSpriteFrameName("W_Sword015.png");
+	itemSprite2->setPosition(itemPosition);
+	this->addChild(itemSprite2);
+
+
+	//#item3
+	itemPoint = objects->getObject("Key");
+	ix = itemPoint["x"].asInt();
+	iy = itemPoint["y"].asInt();
+	itemPosition = Vec2(ix, iy);
+	itemSprite3 = Sprite::createWithSpriteFrameName("I_Key02.png");
+	itemSprite3->setPosition(itemPosition);
+	this->addChild(itemSprite3);
+
+	//#item4
+	itemPoint = objects->getObject("Chest");
+	ix = itemPoint["x"].asInt();
+	iy = itemPoint["y"].asInt();
+	itemPosition = Vec2(ix, iy);
+	itemSprite4 = Sprite::createWithSpriteFrameName("I_Chest02.png");
+	itemSprite4->setPosition(itemPosition);
+	this->addChild(itemSprite4);
+
+	//#item5	Vector(itemV) 사용 Item 생성
 	itemPoint = objects->getObject("Mace");
 	ix = itemPoint["x"].asInt();
 	iy = itemPoint["y"].asInt();
@@ -57,14 +91,16 @@ bool HelloWorld::init()
 	itemV.at(0)->setPosition(itemPosition);
 	this->addChild(itemV.at(0));
 
+	//------------------------------------------------------------------------
 
+	//Sprite 사용 Monster 생성
 	ValueMap monsterPoint = objects->getObject("Wolf");
 	int mx = monsterPoint["x"].asInt();
 	int my = monsterPoint["y"].asInt();
 	monsterPosition = Vec2(mx, my);
-	monster = Sprite::createWithSpriteFrameName("Wolf1.png");
-	monster->setPosition(monsterPosition);
-	this->addChild(monster);
+	monsterSprite1 = Sprite::createWithSpriteFrameName("Wolf1.png");
+	monsterSprite1->setPosition(monsterPosition);
+	this->addChild(monsterSprite1);
 
 	return true;
 }
@@ -73,12 +109,12 @@ bool HelloWorld::init()
 void HelloWorld::createHero()
 {
 	//움직이는 캐릭터 넣기 시작
-	
+
 	//캐릭터 읽어 오기
 	auto cache = SpriteFrameCache::getInstance();
 	cache->addSpriteFramesWithFile("animations/Holygrail.plist");
 	//auto texture = Director::getInstance()->getTextureCache()->addImage("Images/dragon_animation.png");
-		
+
 	for (int i = 1; i < 4; i++) {
 		sprintf(str, "Hero%02d.png", i);
 
@@ -90,15 +126,13 @@ void HelloWorld::createHero()
 	hero->setPosition(heroPosition);
 	this->addChild(hero);
 
-	//드래곤의 방향을 바꿔준다.
+	//영웅의 방향을 바꿔준다.
 	hero->setFlippedX(true);
 
 	auto animation = Animation::createWithSpriteFrames(animFrames, 0.1f);
 	auto animate = Animate::create(animation);
 	auto rep = RepeatForever::create(animate);
 	hero->runAction(rep);
-
-
 
 }
 
@@ -140,13 +174,13 @@ void HelloWorld::onTouchEnded(Touch* touch, Event* event)
 		if (diff.x > 0) {
 			playerPos.x += tmap->getTileSize().width;
 
-			//드래곤의 방향을 바꿔준다.
+			//영웅의 방향을 바꿔준다.
 			hero->setFlippedX(true);
 		}
 		else {
 			playerPos.x -= tmap->getTileSize().width;
 
-			//드래곤의 방향을 바꿔준다.
+			//영웅의 방향을 바꿔준다.
 			hero->setFlippedX(false);
 		}
 	}
@@ -165,9 +199,10 @@ void HelloWorld::onTouchEnded(Touch* touch, Event* event)
 		playerPos.x >= 0)
 	{
 		//hero->setPosition(playerPos);
+		log("캐릭터 이동 ! playerPos.x : %f ,playerPos.y : %f", playerPos.x, playerPos.y);
 		this->setPlayerPosition(playerPos);
 	}
-	//드래곤의 위치에 맞춰 화면 위치 조정
+	//영웅의 위치에 맞춰 화면 위치 조정
 	this->setViewpointCenter(hero->getPosition());
 }
 
@@ -197,8 +232,6 @@ Vec2 HelloWorld::tileCoordForPosition(Vec2 position)
 
 void HelloWorld::setPlayerPosition(Vec2 position)
 {
-	//추가된 부분 시작 -----------------------------
-
 	//탭된 위치 구하기
 	Vec2 tileCoord = this->tileCoordForPosition(position);
 
@@ -211,42 +244,57 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 		Value properties = tmap->getPropertiesForGID(tileGid);
 
 		if (!properties.isNull()) {
-			/*	std::string wall = properties.asValueMap()["Wall"].asString();
-			if (wall == "YES") {
-			log("Wall..");
-			return;
-			}*/
+			//Item--------------------------------------------------------------------
 			std::string item1 = properties.asValueMap()["Items"].asString();
 			if (item1 == "Sword") {
-
 				this->metainfo->removeTileAt(tileCoord);
-				//items->removeTileAt(tileCoord);
-				removeChild(item);
-
-
-				//먹은 수만큼 점수를 올려주는 코드가 추가적으로 필요하다.
+				removeChild(itemSprite1);					//items->removeTileAt(tileCoord);
 				log("검 획득");
 				status = 1;
 			}
+			else  if (item1 == "Sword2") {
+
+				this->metainfo->removeTileAt(tileCoord);
+				removeChild(itemSprite2);
+				log("엑스칼리버 획득");
+				status = 10;
+			}
+			else if (item1 == "Key") {
+				this->metainfo->removeTileAt(tileCoord);
+				removeChild(itemSprite3);
+				log("열쇠 획득\n 상자를 열 수 있습니다!");
+				status = 20;
+			}
+			else if (item1 == "Chest") {
+				this->metainfo->removeTileAt(tileCoord);
+				removeChild(itemSprite4);
+				log("상자 오픈!\n 다음 스테이지로~");
+				status = 99;
+			}
+			//Vector로 생성한 item
 			else if (item1 == "Mace") {
 				this->metainfo->removeTileAt(tileCoord);
 				//items->removeTileAt(tileCoord);
 				removeChild(itemV.at(0));
-
-
 				//먹은 수만큼 점수를 올려주는 코드가 추가적으로 필요하다.
 				log("메이스 획득");
 				status = 2;
 			}
+			//Monster----------------------------------------------------------
 			std::string monster1 = properties.asValueMap()["Monster"].asString();
 			if (monster1 == "Wolf" && status >= 1) {
-
 				this->metainfo->removeTileAt(tileCoord);
-				//items->removeTileAt(tileCoord);
-
-				removeChild(monster);
-				//먹은 수만큼 점수를 올려주는 코드가 추가적으로 필요하다.
+				removeChild(monsterSprite1);
 				log("늑대 처치");
+				fight = 1;
+			}
+			else if(status == 0)
+			{
+				log("else Check : x.%f y.%f", heroPosition.x, heroPosition.y);
+				hero->setPosition(heroPosition);
+				log("늑대 쎄다..\n늑대는 검 이상의 무기로 공격 할 수 있습니다.");
+				return;
+				
 			}
 		}
 	}
