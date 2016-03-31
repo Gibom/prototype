@@ -53,6 +53,7 @@ public:
 
 	//Function
 	void createHero();
+	void createMonster(int i);
 	void setViewpointCenter(cocos2d::Vec2 position);
 	cocos2d::Vec2 tileCoordForPosition(cocos2d::Vec2 position);
 	void setPlayerPosition(cocos2d::Vec2 position);

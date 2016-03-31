@@ -40,7 +40,7 @@ bool HelloWorld::init()
 	heroPosition = Vec2(x, y);
 	log("Hero Create Check : x.%f y.%f", heroPosition.x, heroPosition.y);
 	this->createHero();
-
+	
 	//아이템, 몬스터 생성
 
 	//Sprite 사용 Item 생성
@@ -98,14 +98,25 @@ bool HelloWorld::init()
 	int mx = monsterPoint["x"].asInt();
 	int my = monsterPoint["y"].asInt();
 	monsterPosition = Vec2(mx, my);
-	monsterSprite1 = Sprite::createWithSpriteFrameName("Wolf1.png");
-	monsterSprite1->setPosition(monsterPosition);
-	this->addChild(monsterSprite1);
+	this->createMonster(1);
+
+	monsterPoint = objects->getObject("Jelly");
+	mx = monsterPoint["x"].asInt();
+	my = monsterPoint["y"].asInt();
+	monsterPosition = Vec2(mx, my);
+	this->createMonster(2);
+
+	monsterPoint = objects->getObject("Demon");
+	mx = monsterPoint["x"].asInt();
+	my = monsterPoint["y"].asInt();
+	monsterPosition = Vec2(mx, my);
+	this->createMonster(3);
 
 	return true;
 }
 
-
+//애니메이션 생성
+//Hero---------------------------------------------------------------------
 void HelloWorld::createHero()
 {
 	//움직이는 캐릭터 넣기 시작
@@ -136,7 +147,59 @@ void HelloWorld::createHero()
 
 }
 
+//Monster---------------------------------------------------------------------
+void HelloWorld::createMonster(int i)
+{
 
+	int div = i;
+	log("Monster");
+	//움직이는 캐릭터 넣기 시작
+
+	//캐릭터 읽어 오기
+	auto cache = SpriteFrameCache::getInstance();
+	cache->addSpriteFramesWithFile("animations/Holygrail.plist");
+	//auto texture = Director::getInstance()->getTextureCache()->addImage("Images/dragon_animation.png");
+	animFrames2.clear();
+	for (int i = 1; i < 4; i++) {
+
+		if (div == 1)
+			sprintf(str, "Wolf%d.png", i);
+		else if (div == 2)
+			sprintf(str, "Jelly%d.png", i);
+		else if (div == 3)
+			sprintf(str, "Demon%d.png", i);
+
+		SpriteFrame* frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(str);
+		animFrames2.pushBack(frame);
+		log("Monster FOR");
+	}
+
+	auto animation = Animation::createWithSpriteFrames(animFrames2, 0.1f);
+	auto animate = Animate::create(animation);
+	auto rep = RepeatForever::create(animate);
+
+	//스프라이트 생성 및 초기화
+	log("Monster Sprite before");
+	if (div == 1) {
+		monsterSprite1 = Sprite::createWithSpriteFrameName("Wolf1.png");
+		monsterSprite1->setPosition(monsterPosition);
+		this->addChild(monsterSprite1);
+		monsterSprite1->runAction(rep);
+	}
+	else if (div == 2) {
+		monsterSprite2 = Sprite::createWithSpriteFrameName("Jelly1.png");
+		monsterSprite2->setPosition(monsterPosition);
+		this->addChild(monsterSprite2);
+		monsterSprite2->runAction(rep);
+	}
+	else if (div == 3) {
+		monsterSprite3 = Sprite::createWithSpriteFrameName("Demon1.png");
+		monsterSprite3->setPosition(monsterPosition);
+		this->addChild(monsterSprite3);
+		monsterSprite3->runAction(rep);
+	}
+
+}
 void HelloWorld::onEnter()
 {
 	Layer::onEnter();
@@ -246,55 +309,86 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 		if (!properties.isNull()) {
 			//Item--------------------------------------------------------------------
 			std::string item1 = properties.asValueMap()["Items"].asString();
-			if (item1 == "Sword") {
+
+			if (item1 == "Sword" && status == 0) {
 				this->metainfo->removeTileAt(tileCoord);
 				removeChild(itemSprite1);					//items->removeTileAt(tileCoord);
 				log("검 획득");
 				status = 1;
 			}
-			else  if (item1 == "Sword2") {
+			else  if (item1 == "Sword2" && status == 0) {
 
 				this->metainfo->removeTileAt(tileCoord);
 				removeChild(itemSprite2);
-				log("엑스칼리버 획득");
-				status = 10;
+				log("성검 획득");
+				status = 3;
 			}
-			else if (item1 == "Key") {
+			else if (item1 == "Key" && status == 0) {
 				this->metainfo->removeTileAt(tileCoord);
 				removeChild(itemSprite3);
 				log("열쇠 획득\n 상자를 열 수 있습니다!");
 				status = 20;
 			}
-			else if (item1 == "Chest") {
+			else if (item1 == "Chest" && status == 20) {
 				this->metainfo->removeTileAt(tileCoord);
 				removeChild(itemSprite4);
 				log("상자 오픈!\n 다음 스테이지로~");
 				status = 99;
 			}
 			//Vector로 생성한 item
-			else if (item1 == "Mace") {
+			else if (item1 == "Mace" && status == 0) {
 				this->metainfo->removeTileAt(tileCoord);
 				//items->removeTileAt(tileCoord);
 				removeChild(itemV.at(0));
 				//먹은 수만큼 점수를 올려주는 코드가 추가적으로 필요하다.
-				log("메이스 획득");
 				status = 2;
+				log("메이스 획득 %d",status);
+				
 			}
+			else if (item1 != "" && status != 0)
+			{
+				log("무기를 더 습득 할 수 없습니다.");
+				return;
+			}
+
 			//Monster----------------------------------------------------------
 			std::string monster1 = properties.asValueMap()["Monster"].asString();
-			if (monster1 == "Wolf" && status >= 1) {
+
+			if (monster1 == "Wolf" && status == 1) {
 				this->metainfo->removeTileAt(tileCoord);
 				removeChild(monsterSprite1);
 				log("늑대 처치");
-				fight = 1;
+				status = 0;
 			}
-			else if(status == 0)
+			else if(monster1 == "Wolf" && status != 1)
 			{
-				log("else Check : x.%f y.%f", heroPosition.x, heroPosition.y);
 				hero->setPosition(heroPosition);
-				log("늑대 쎄다..\n늑대는 검 이상의 무기로 공격 할 수 있습니다.");
+				log("뭔가 뾰족한게 필요해..\n늑대는 '검'으로 공격 할 수 있습니다.");
 				return;
-				
+			}
+			if (monster1 == "Jelly" && status == 2) {
+				this->metainfo->removeTileAt(tileCoord);
+				removeChild(monsterSprite2);
+				log("젤리 처치");
+				status = 0;
+			}
+			else if (monster1 == "Jelly" && status != 2)
+			{
+				hero->setPosition(heroPosition);
+				log("뭔가 내려칠게 필요해..\n젤리는 '메이스'로 공격 할 수 있습니다.");
+				return;
+			}
+			if (monster1 == "Demon" && status == 3) {
+				this->metainfo->removeTileAt(tileCoord);
+				removeChild(monsterSprite3);
+				log("악마 처치");
+				status = 0;
+			}
+			else if (monster1 == "Demon" && status != 3)
+			{
+				hero->setPosition(heroPosition);
+				log("뭔가 신성한 무기가 필요해..\n악마는 '성검'으로 공격 할 수 있습니다.");
+				return;
 			}
 		}
 	}
