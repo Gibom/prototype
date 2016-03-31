@@ -40,14 +40,14 @@ bool HelloWorld::init()
 	heroPosition = Vec2(x, y);
 	log("Hero Create Check : x.%f y.%f", heroPosition.x, heroPosition.y);
 	this->createHero();
-	
+
 	//아이템, 몬스터 생성
 
 	//현재 습득한 아이템
 	ValueMap curitemPoint = objects->getObject("CurrentItem");
 	int cx = curitemPoint["x"].asInt();
 	int cy = curitemPoint["y"].asInt();
-	curItemPosition = Vec2(cx,cy);
+	curItemPosition = Vec2(cx, cy);
 
 	//Sprite 사용 Item 생성
 	//#item1
@@ -132,7 +132,7 @@ void HelloWorld::createHero()
 	cache->addSpriteFramesWithFile("animations/Holygrail.plist");
 	//auto texture = Director::getInstance()->getTextureCache()->addImage("Images/dragon_animation.png");
 
-	for (int i = 1; i < 4; i++) {
+	for (int i = 4; i < 7; i++) {
 		sprintf(str, "Hero%02d.png", i);
 
 		SpriteFrame* frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(str);
@@ -148,8 +148,8 @@ void HelloWorld::createHero()
 
 	auto animation = Animation::createWithSpriteFrames(animFrames, 0.1f);
 	auto animate = Animate::create(animation);
-	auto rep = RepeatForever::create(animate);
-	hero->runAction(rep);
+	//auto rep = RepeatForever::create(animate);
+	hero->runAction(animate);
 
 }
 
@@ -238,26 +238,66 @@ void HelloWorld::onTouchEnded(Touch* touch, Event* event)
 
 	Vec2 playerPos = hero->getPosition();
 	Vec2 diff = touchPoint - playerPos;
-
+	
 	if (abs(diff.x) > abs(diff.y)) {
 		if (diff.x > 0) {
+			animFrames.clear();
+			for (int i = 4; i < 7; i++) {
+				sprintf(str, "Hero%02d.png", i);
+
+				SpriteFrame* frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(str);
+				animFrames.pushBack(frame);
+			}
+			auto animation = Animation::createWithSpriteFrames(animFrames, 0.1f);
+			auto animate = Animate::create(animation);
+			hero->runAction(animate);
 			playerPos.x += tmap->getTileSize().width;
 
 			//영웅의 방향을 바꿔준다.
-			hero->setFlippedX(true);
+			//hero->setFlippedX(true);
 		}
 		else {
+			animFrames.clear();
+			for (int i = 7; i < 10; i++) {
+				sprintf(str, "Hero%02d.png", i);
+
+				SpriteFrame* frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(str);
+				animFrames.pushBack(frame);
+			}
+			auto animation = Animation::createWithSpriteFrames(animFrames, 0.1f);
+			auto animate = Animate::create(animation);
+			hero->runAction(animate);
 			playerPos.x -= tmap->getTileSize().width;
 
 			//영웅의 방향을 바꿔준다.
-			hero->setFlippedX(false);
+			//hero->setFlippedX(false);
 		}
 	}
 	else {
 		if (diff.y > 0) {
+			animFrames.clear();
+			for (int i = 10; i < 13; i++) {
+				sprintf(str, "Hero%02d.png", i);
+
+				SpriteFrame* frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(str);
+				animFrames.pushBack(frame);
+			}
+			auto animation = Animation::createWithSpriteFrames(animFrames, 0.1f);
+			auto animate = Animate::create(animation);
+			hero->runAction(animate);
 			playerPos.y += tmap->getTileSize().height;
 		}
 		else {
+			animFrames.clear();
+			for (int i = 1; i < 4; i++) {
+				sprintf(str, "Hero%02d.png", i);
+
+				SpriteFrame* frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(str);
+				animFrames.pushBack(frame);
+			}
+			auto animation = Animation::createWithSpriteFrames(animFrames, 0.1f);
+			auto animate = Animate::create(animation);
+			hero->runAction(animate);
 			playerPos.y -= tmap->getTileSize().height;
 		}
 	}
@@ -319,7 +359,7 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 			if (item1 == "Sword" && status == 0) {
 				itemSprite1->setPosition(curItemPosition);
 				this->metainfo->removeTileAt(tileCoord);
-							
+
 				log("검 획득");
 				status = 1;
 			}
@@ -347,10 +387,10 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 			else if (item1 == "Mace" && status == 0) {
 				itemV.at(0)->setPosition(curItemPosition);
 				this->metainfo->removeTileAt(tileCoord);
-				
+
 				status = 2;
-				log("메이스 획득 %d",status);
-				
+				log("메이스 획득 %d", status);
+
 			}
 			else if (item1 != "" && status != 0)
 			{
@@ -368,7 +408,7 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 				log("늑대 처치");
 				status = 0;
 			}
-			else if(monster1 == "Wolf" && status != 1)
+			else if (monster1 == "Wolf" && status != 1)
 			{
 				//hero->setPosition(heroPosition);	스폰 위치로 초기화
 				log("뭔가 뾰족한게 필요해..\n늑대는 '검'으로 공격 할 수 있습니다.");
@@ -402,7 +442,16 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 			}
 		}
 	}
-	hero->setPosition(position);
+	Vec2 action = Vec2(position.x, position.y);
+	
+	auto myAction = MoveTo::create(0.3, position);
+	if(hero->numberOfRunningActions()<=2){
+		hero->runAction(myAction);
+		
+	}else{
+		log("!1 ACTION");
+	}
+	//hero->setPosition(position);
 }
 
 
