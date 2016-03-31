@@ -18,6 +18,7 @@ public:
 	//Position
 	cocos2d::Size winSize;
 	cocos2d::Vec2 itemPosition;
+	cocos2d::Vec2 curItemPosition;
 	cocos2d::Vec2 monsterPosition;
 	cocos2d::Vec2 heroPosition;
 	

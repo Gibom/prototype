@@ -43,6 +43,12 @@ bool HelloWorld::init()
 	
 	//아이템, 몬스터 생성
 
+	//현재 습득한 아이템
+	ValueMap curitemPoint = objects->getObject("CurrentItem");
+	int cx = curitemPoint["x"].asInt();
+	int cy = curitemPoint["y"].asInt();
+	curItemPosition = Vec2(cx,cy);
+
 	//Sprite 사용 Item 생성
 	//#item1
 	ValueMap itemPoint = objects->getObject("Sword");
@@ -311,36 +317,37 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 			std::string item1 = properties.asValueMap()["Items"].asString();
 
 			if (item1 == "Sword" && status == 0) {
+				itemSprite1->setPosition(curItemPosition);
 				this->metainfo->removeTileAt(tileCoord);
-				removeChild(itemSprite1);					//items->removeTileAt(tileCoord);
+							
 				log("검 획득");
 				status = 1;
 			}
 			else  if (item1 == "Sword2" && status == 0) {
-
+				itemSprite2->setPosition(curItemPosition);
 				this->metainfo->removeTileAt(tileCoord);
-				removeChild(itemSprite2);
+				//removeChild(itemSprite2);
 				log("성검 획득");
 				status = 3;
 			}
 			else if (item1 == "Key" && status == 0) {
+				itemSprite3->setPosition(curItemPosition);
 				this->metainfo->removeTileAt(tileCoord);
-				removeChild(itemSprite3);
 				log("열쇠 획득\n 상자를 열 수 있습니다!");
 				status = 20;
 			}
 			else if (item1 == "Chest" && status == 20) {
 				this->metainfo->removeTileAt(tileCoord);
 				removeChild(itemSprite4);
+				removeChild(itemSprite3);
 				log("상자 오픈!\n 다음 스테이지로~");
 				status = 99;
 			}
 			//Vector로 생성한 item
 			else if (item1 == "Mace" && status == 0) {
+				itemV.at(0)->setPosition(curItemPosition);
 				this->metainfo->removeTileAt(tileCoord);
-				//items->removeTileAt(tileCoord);
-				removeChild(itemV.at(0));
-				//먹은 수만큼 점수를 올려주는 코드가 추가적으로 필요하다.
+				
 				status = 2;
 				log("메이스 획득 %d",status);
 				
@@ -357,36 +364,39 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 			if (monster1 == "Wolf" && status == 1) {
 				this->metainfo->removeTileAt(tileCoord);
 				removeChild(monsterSprite1);
+				removeChild(itemSprite1);
 				log("늑대 처치");
 				status = 0;
 			}
 			else if(monster1 == "Wolf" && status != 1)
 			{
-				hero->setPosition(heroPosition);
+				//hero->setPosition(heroPosition);	스폰 위치로 초기화
 				log("뭔가 뾰족한게 필요해..\n늑대는 '검'으로 공격 할 수 있습니다.");
 				return;
 			}
 			if (monster1 == "Jelly" && status == 2) {
 				this->metainfo->removeTileAt(tileCoord);
 				removeChild(monsterSprite2);
+				removeChild(itemV.at(0));
 				log("젤리 처치");
 				status = 0;
 			}
 			else if (monster1 == "Jelly" && status != 2)
 			{
-				hero->setPosition(heroPosition);
+				//hero->setPosition(heroPosition);
 				log("뭔가 내려칠게 필요해..\n젤리는 '메이스'로 공격 할 수 있습니다.");
 				return;
 			}
 			if (monster1 == "Demon" && status == 3) {
 				this->metainfo->removeTileAt(tileCoord);
 				removeChild(monsterSprite3);
+				removeChild(itemSprite2);
 				log("악마 처치");
 				status = 0;
 			}
 			else if (monster1 == "Demon" && status != 3)
 			{
-				hero->setPosition(heroPosition);
+				//hero->setPosition(heroPosition);
 				log("뭔가 신성한 무기가 필요해..\n악마는 '성검'으로 공격 할 수 있습니다.");
 				return;
 			}
