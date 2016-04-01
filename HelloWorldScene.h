@@ -14,7 +14,7 @@ public:
 	char str[100] = { 0 };
 	int status = 0;	//현재 영웅 아이템 보유상태
 	int fight = 0;	//몬스터 충돌시 비교 카운트
-
+	int stage = 0;
 	//Position
 	cocos2d::Size winSize;
 	cocos2d::Vec2 itemPosition;
@@ -38,6 +38,8 @@ public:
 	
 	//Tile
 	cocos2d::TMXTiledMap* tmap;
+	cocos2d::TMXTiledMap* tmap1;
+	cocos2d::TMXTiledMap* tmap2;
 	cocos2d::TMXLayer* background;
 	cocos2d::TMXLayer* items;
 	cocos2d::TMXLayer* metainfo;
@@ -55,9 +57,11 @@ public:
 	//Function
 	void createHero();
 	void createMonster(int i);
+	void fadeRemove(int i);
 	void setViewpointCenter(cocos2d::Vec2 position);
 	cocos2d::Vec2 tileCoordForPosition(cocos2d::Vec2 position);
 	void setPlayerPosition(cocos2d::Vec2 position);
+	void changeStage(int i);
 };
 
 #endif // __HELLOWORLD_SCENE_H__

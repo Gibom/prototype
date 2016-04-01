@@ -23,7 +23,10 @@ bool HelloWorld::init()
 	winSize = Director::getInstance()->getWinSize();
 
 	//타일맵 읽어 오기
-	tmap = TMXTiledMap::create("TileMaps/holygrail_tutorial.tmx");
+	tmap= TMXTiledMap::create("TileMaps/holygrail_tutorial.tmx");
+	tmap1= TMXTiledMap::create("TileMaps/holygrail_stage1.tmx");
+	//tmap2 = TMXTiledMap::create("TileMaps/holygrail_tutorial.tmx");
+	
 	background = tmap->getLayer("Background");
 	//items = tmap->getLayer("Items");
 	metainfo = tmap->getLayer("MetaInfo");
@@ -84,7 +87,7 @@ bool HelloWorld::init()
 	ix = itemPoint["x"].asInt();
 	iy = itemPoint["y"].asInt();
 	itemPosition = Vec2(ix, iy);
-	itemSprite4 = Sprite::createWithSpriteFrameName("I_Chest02.png");
+	itemSprite4 = Sprite::createWithSpriteFrameName("I_Chest01.png");
 	itemSprite4->setPosition(itemPosition);
 	this->addChild(itemSprite4);
 
@@ -382,7 +385,15 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 				removeChild(itemSprite3);
 				log("상자 오픈!\n 다음 스테이지로~");
 				status = 99;
+
+				stage++;
+
 			}
+			else if (item1 == "Chest" && status != 20) {
+				log("상자를 열기위해서는 열쇠가 필요합니다!");
+				return;
+			}
+
 			//Vector로 생성한 item
 			else if (item1 == "Mace" && status == 0) {
 				itemV.at(0)->setPosition(curItemPosition);
@@ -403,8 +414,7 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 
 			if (monster1 == "Wolf" && status == 1) {
 				this->metainfo->removeTileAt(tileCoord);
-				removeChild(monsterSprite1);
-				removeChild(itemSprite1);
+				fadeRemove(1);
 				log("늑대 처치");
 				status = 0;
 			}
@@ -416,8 +426,7 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 			}
 			if (monster1 == "Jelly" && status == 2) {
 				this->metainfo->removeTileAt(tileCoord);
-				removeChild(monsterSprite2);
-				removeChild(itemV.at(0));
+				fadeRemove(2);
 				log("젤리 처치");
 				status = 0;
 			}
@@ -429,8 +438,7 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 			}
 			if (monster1 == "Demon" && status == 3) {
 				this->metainfo->removeTileAt(tileCoord);
-				removeChild(monsterSprite3);
-				removeChild(itemSprite2);
+				fadeRemove(3);
 				log("악마 처치");
 				status = 0;
 			}
@@ -444,9 +452,9 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 	}
 	Vec2 action = Vec2(position.x, position.y);
 	
-	auto myAction = MoveTo::create(0.3, position);
+	auto heroAction = MoveTo::create(0.3, position);
 	if(hero->numberOfRunningActions()<=2){
-		hero->runAction(myAction);
+		hero->runAction(heroAction);
 		
 	}else{
 		log("!1 ACTION");
@@ -455,3 +463,40 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 }
 
 
+void HelloWorld::changeStage(int i) {
+	
+}
+
+void HelloWorld::fadeRemove(int i) {
+	auto fOutAction = FadeOut::create(0.3);
+
+	if (i == 1)
+	{
+		monsterSprite1->runAction(fOutAction);
+		removeChild(itemSprite1);
+
+		if (monsterSprite1->numberOfRunningActions() == 0) {
+			removeChild(monsterSprite1);
+		}
+
+	}
+	else if (i == 2)
+	{
+		monsterSprite2->runAction(fOutAction);
+		removeChild(itemV.at(0));
+
+		if (monsterSprite2->numberOfRunningActions() == 0) {
+			removeChild(monsterSprite2);
+		}
+	}
+	else if (i == 3)
+	{
+		monsterSprite3->runAction(fOutAction);
+		removeChild(itemSprite2);
+
+		if (monsterSprite3->numberOfRunningActions() == 0) {
+			removeChild(monsterSprite3);
+		}
+	}
+	
+}
