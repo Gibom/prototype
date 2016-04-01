@@ -38,7 +38,7 @@ public:
 	
 	//Tile
 	cocos2d::TMXTiledMap* tmap;
-	cocos2d::TMXTiledMap* tmap1;
+	
 	cocos2d::TMXTiledMap* tmap2;
 	cocos2d::TMXLayer* background;
 	cocos2d::TMXLayer* items;
@@ -62,6 +62,8 @@ public:
 	cocos2d::Vec2 tileCoordForPosition(cocos2d::Vec2 position);
 	void setPlayerPosition(cocos2d::Vec2 position);
 	void changeStage(int i);
+	void doChangeScene(Ref* pSender);
+
 };
 
 #endif // __HELLOWORLD_SCENE_H__

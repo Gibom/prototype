@@ -1,5 +1,5 @@
 ﻿#include "HelloWorldScene.h"
-
+#include "StageScene.h"
 USING_NS_CC;
 
 Scene* HelloWorld::createScene()
@@ -24,7 +24,7 @@ bool HelloWorld::init()
 
 	//타일맵 읽어 오기
 	tmap= TMXTiledMap::create("TileMaps/holygrail_tutorial.tmx");
-	tmap1= TMXTiledMap::create("TileMaps/holygrail_stage1.tmx");
+	
 	//tmap2 = TMXTiledMap::create("TileMaps/holygrail_tutorial.tmx");
 	
 	background = tmap->getLayer("Background");
@@ -55,6 +55,9 @@ bool HelloWorld::init()
 	//Sprite 사용 Item 생성
 	//#item1
 	ValueMap itemPoint = objects->getObject("Sword");
+	int id = itemPoint["itemDiv"].asInt();
+	log("id : %d", id);
+
 	int ix = itemPoint["x"].asInt();
 	int iy = itemPoint["y"].asInt();
 	itemPosition = Vec2(ix, iy);
@@ -385,9 +388,8 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 				removeChild(itemSprite3);
 				log("상자 오픈!\n 다음 스테이지로~");
 				status = 99;
-
+				doChangeScene(this);
 				stage++;
-
 			}
 			else if (item1 == "Chest" && status != 20) {
 				log("상자를 열기위해서는 열쇠가 필요합니다!");
@@ -397,10 +399,11 @@ void HelloWorld::setPlayerPosition(Vec2 position)
 			//Vector로 생성한 item
 			else if (item1 == "Mace" && status == 0) {
 				itemV.at(0)->setPosition(curItemPosition);
+				
 				this->metainfo->removeTileAt(tileCoord);
 
 				status = 2;
-				log("메이스 획득 %d", status);
+				log("메이스 획득 %d");
 
 			}
 			else if (item1 != "" && status != 0)
@@ -478,7 +481,6 @@ void HelloWorld::fadeRemove(int i) {
 		if (monsterSprite1->numberOfRunningActions() == 0) {
 			removeChild(monsterSprite1);
 		}
-
 	}
 	else if (i == 2)
 	{
@@ -499,4 +501,11 @@ void HelloWorld::fadeRemove(int i) {
 		}
 	}
 	
+}
+
+void HelloWorld::doChangeScene(Ref* pSender)
+{
+	//스테이지 화면으로 전환
+	auto pScene = StageScene::createScene();
+	Director::getInstance()->replaceScene(pScene);
 }
