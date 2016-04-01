@@ -1,0 +1,26 @@
+[다수의 아이템, 몬스터]
+metainfo가 존재하는곳마다 해당되는 이미지를 매치시켜야한다.
+
+-타일 object에 각각 itemDiv, monDiv 속성 설정
+
+-vector로 객체 생성 
+  	
+	itemPoint = objects->getObject("Mace");
+	id = itemPoint["itemDiv"].asInt();
+	ix = itemPoint["x"].asInt();
+	iy = itemPoint["y"].asInt();
+	itemPosition = Vec2(ix, iy);
+	
+	itemV.pushBack(Sprite::createWithSpriteFrameName("W_Mace008.png"));
+	itemV.at(0)->setPosition(itemPosition);
+	this->addChild(itemV.at(0));
+
+  
+  
+  반복문 사용 
+  
+  조건 
+  itemV.at(i) != null i++
+	기능
+		itemV.at(0)->setTag(itemDiv)
+		
